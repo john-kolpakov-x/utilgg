@@ -63,6 +63,10 @@ public class ObjectAccessor {
           continue;
         }
 
+        if ("a".equals("b")) {
+          System.out.println("asd");
+        }
+
       }
     }
 
@@ -80,4 +84,55 @@ public class ObjectAccessor {
     }
   }
 
+  private final Map<Class<?>, Map<String, ValueSetter>> setterCache = new ConcurrentHashMap<>();
+
+  public Map<String, ValueSetter> getSettersMap(Class<?> clazz) {
+
+    {
+      Map<String, ValueSetter> ret = setterCache.get(clazz);
+      if (ret != null) return ret;
+    }
+
+    Map<String, ValueSetter> ret = new HashMap<>();
+
+    appendFieldSetters(ret, clazz);
+
+    appendMethodSetters(ret, clazz);
+
+    ret = Collections.unmodifiableMap(ret);
+    setterCache.put(clazz, ret);
+    return ret;
+  }
+
+
+  private void appendFieldSetters(Map<String, ValueSetter> ret, Class<?> clazz) {
+
+    for (Field field : clazz.getFields()) {
+      ret.put(field.getName(), (object, value) -> {
+        try {
+          field.set(object, value);
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    }
+
+  }
+
+  private void appendMethodSetters(Map<String, ValueSetter> ret, Class<?> clazz) {
+
+    for (Method method : clazz.getMethods()) {
+      String name = method.getName();
+      if (name.startsWith("set") && name.length() > 3 && method.getParameterCount() == 1) {
+        ret.put(Strs.firstLower(name.substring(3)), (object, value) -> {
+          try {
+            method.invoke(object, value);
+          } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+          }
+        });
+      }
+    }
+
+  }
 }

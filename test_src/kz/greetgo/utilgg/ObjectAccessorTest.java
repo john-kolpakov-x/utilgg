@@ -67,6 +67,23 @@ public class ObjectAccessorTest {
   }
 
   @Test
+  public void getSettersMap_onlyField() throws Exception {
+
+    Map<String, ValueSetter> settersMap = objectAccessor.getSettersMap(Asd.class);
+
+    assertThat(settersMap).containsKeys("onlyField");
+
+    String rndOnlyField = RND.str(10);
+
+    Asd asd = new Asd();
+
+    settersMap.get("onlyField").setValue(asd, rndOnlyField);
+
+    assertThat(asd.onlyField).isEqualTo(rndOnlyField);
+
+  }
+
+  @Test
   public void getGettersMap_property() throws Exception {
 
     Map<String, ValueGetter> gettersMap = objectAccessor.getGettersMap(Asd.class);
@@ -80,6 +97,23 @@ public class ObjectAccessorTest {
 
     Object propertyFieldValue = gettersMap.get("property").getValue(asd);
     assertThat(propertyFieldValue).isEqualTo(rndValue + "_set_get");
+
+  }
+
+  @Test
+  public void getSettersMap_property() throws Exception {
+
+    Map<String, ValueSetter> settersMap = objectAccessor.getSettersMap(Asd.class);
+
+    assertThat(settersMap).containsKeys("property");
+
+    String rndValue = RND.str(10);
+
+    Asd asd = new Asd();
+
+    settersMap.get("property").setValue(asd, rndValue);
+
+    assertThat(asd.getProperty()).isEqualTo(rndValue + "_set_get");
 
   }
 
@@ -101,6 +135,23 @@ public class ObjectAccessorTest {
   }
 
   @Test
+  public void getSettersMap_propertyBool() throws Exception {
+
+    Map<String, ValueSetter> settersMap = objectAccessor.getSettersMap(Asd.class);
+
+    assertThat(settersMap).containsKeys("propertyBool");
+
+    boolean rndValue = RND.bool();
+
+    Asd asd = new Asd();
+
+    settersMap.get("propertyBool").setValue(asd, rndValue);
+
+    assertThat(asd.isPropertyBool()).isEqualTo(!rndValue);
+
+  }
+
+  @Test
   public void getGettersMap_propertyField() throws Exception {
 
     Map<String, ValueGetter> gettersMap = objectAccessor.getGettersMap(Asd.class);
@@ -114,6 +165,23 @@ public class ObjectAccessorTest {
 
     Object actual = gettersMap.get("propertyField").getValue(asd);
     assertThat(actual).isEqualTo(rndValue + "_SET_GET");
+
+  }
+
+  @Test
+  public void getSettersMap_propertyField() throws Exception {
+
+    Map<String, ValueSetter> settersMap = objectAccessor.getSettersMap(Asd.class);
+
+    assertThat(settersMap).containsKeys("propertyField");
+
+    String rndValue = RND.str(10);
+
+    Asd asd = new Asd();
+
+    settersMap.get("propertyField").setValue(asd, rndValue);
+
+    assertThat(asd.getPropertyField()).isEqualTo(rndValue + "_SET_GET");
 
   }
 }
