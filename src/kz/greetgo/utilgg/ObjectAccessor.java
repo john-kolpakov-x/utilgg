@@ -3,9 +3,7 @@ package kz.greetgo.utilgg;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ObjectAccessor {
@@ -134,5 +132,74 @@ public class ObjectAccessor {
       }
     }
 
+  }
+
+  private final Map<Class<?>, Map<String, ValueAcceptor>> acceptorsCache = new ConcurrentHashMap<>();
+
+  public Map<String, ValueAcceptor> getAcceptorsMap(Class<?> clazz) {
+
+    {
+      Map<String, ValueAcceptor> ret = acceptorsCache.get(clazz);
+      if (ret != null) return null;
+    }
+
+    Map<String, ValueAcceptor> ret = new HashMap<>();
+
+    Map<String, ValueGetter> gettersMap = getGettersMap(clazz);
+    Map<String, ValueSetter> settersMap = getSettersMap(clazz);
+
+    Set<String> all = new HashSet<>();
+    all.addAll(gettersMap.keySet());
+    all.addAll(settersMap.keySet());
+
+    for (String name : all) {
+      ret.put(name, new ValueAcceptor() {
+        ValueGetter getter = null;
+        boolean checkGetter = true;
+
+        ValueSetter setter = null;
+        boolean checkSetter = true;
+
+        @Override
+        public boolean isReadOnly() {
+          if (checkGetter) checkGetter();
+          if (checkSetter) checkSetter();
+          return getter != null && setter == null;
+        }
+
+        @Override
+        public boolean isWriteOnly() {
+          if (checkGetter) checkGetter();
+          if (checkSetter) checkSetter();
+          return getter == null && setter != null;
+        }
+
+        @Override
+        public Object getValue(Object object) {
+          if (checkGetter) checkGetter();
+          return getter.getValue(object);
+        }
+
+        @Override
+        public void setValue(Object object, Object value) {
+          if (checkSetter) checkSetter();
+          setter.setValue(object, value);
+        }
+
+        private void checkGetter() {
+          getter = gettersMap.get(name);
+          checkGetter = false;
+        }
+
+        private void checkSetter() {
+          setter = settersMap.get(name);
+          checkSetter = false;
+        }
+      });
+    }
+
+    ret = Collections.unmodifiableMap(ret);
+    acceptorsCache.put(clazz, ret);
+    return ret;
   }
 }

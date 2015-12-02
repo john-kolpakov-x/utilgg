@@ -17,6 +17,16 @@ public class ObjectAccessorTest {
 
     public String propertyField;
 
+    public String readOnlyField;
+
+    public String writeOnlyField;
+
+    public String readWriteField;
+
+    public void setWriteOnly(String writeOnlyField) {
+      this.writeOnlyField = writeOnlyField;
+    }
+
     public String getProperty() {
       return property + "_get";
     }
@@ -39,6 +49,18 @@ public class ObjectAccessorTest {
 
     public void setPropertyField(String propertyField) {
       this.propertyField = propertyField + "_SET";
+    }
+
+    public String getReadOnly() {
+      return readOnlyField;
+    }
+
+    public String getReadWrite() {
+      return readWriteField;
+    }
+
+    public void setReadWrite(String readWriteField) {
+      this.readWriteField = readWriteField;
     }
   }
 
@@ -183,5 +205,63 @@ public class ObjectAccessorTest {
 
     assertThat(asd.getPropertyField()).isEqualTo(rndValue + "_SET_GET");
 
+  }
+
+  @Test
+  public void getAcceptors_write() throws Exception {
+
+    Map<String, ValueAcceptor> acceptorMap = objectAccessor.getAcceptorsMap(Asd.class);
+
+    assertThat(acceptorMap).containsKeys("readOnly", "writeOnly", "readWrite");
+
+    Asd asd = new Asd();
+
+    String writeOnly = RND.str(10);
+    String readWrite = RND.str(10);
+
+    //write
+    acceptorMap.get("writeOnly").setValue(asd, writeOnly);
+    acceptorMap.get("readWrite").setValue(asd, readWrite);
+
+    assertThat(asd.writeOnlyField).isEqualTo(writeOnly);
+    assertThat(asd.readWriteField).isEqualTo(readWrite);
+  }
+
+  @Test
+  public void getAcceptors_read() throws Exception {
+
+    Map<String, ValueAcceptor> acceptorMap = objectAccessor.getAcceptorsMap(Asd.class);
+
+    assertThat(acceptorMap).containsKeys("readOnly", "writeOnly", "readWrite");
+
+    Asd asd = new Asd();
+
+    String readOnly = RND.str(10);
+    String readWrite = RND.str(10);
+
+    //read
+    asd.readOnlyField = readOnly;
+    asd.readWriteField = readWrite;
+
+    assertThat(acceptorMap.get("readOnly").getValue(asd)).isEqualTo(readOnly);
+    assertThat(acceptorMap.get("readWrite").getValue(asd)).isEqualTo(readWrite);
+  }
+
+
+  @Test
+  public void getAcceptors_isReadOnly_isWriteOnly() throws Exception {
+
+    Map<String, ValueAcceptor> acceptorMap = objectAccessor.getAcceptorsMap(Asd.class);
+
+    assertThat(acceptorMap).containsKeys("readOnly", "writeOnly", "readWrite");
+
+    assertThat(acceptorMap.get("readOnly").isReadOnly()).isTrue();
+    assertThat(acceptorMap.get("readOnly").isWriteOnly()).isFalse();
+
+    assertThat(acceptorMap.get("writeOnly").isReadOnly()).isFalse();
+    assertThat(acceptorMap.get("writeOnly").isWriteOnly()).isTrue();
+
+    assertThat(acceptorMap.get("readWrite").isReadOnly()).isFalse();
+    assertThat(acceptorMap.get("readWrite").isWriteOnly()).isFalse();
   }
 }
