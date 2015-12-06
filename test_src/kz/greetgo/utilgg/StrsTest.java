@@ -2,6 +2,9 @@ package kz.greetgo.utilgg;
 
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StrsTest {
@@ -36,5 +39,48 @@ public class StrsTest {
     assertThat(Strs.firstUpper(null)).isNull();
     assertThat(Strs.firstUpper("")).isEmpty();
     assertThat(Strs.firstUpper("x")).isEqualTo("X");
+  }
+
+  @Test
+  public void join_array() throws Exception {
+
+    String s1 = RND.str(10);
+    String s2 = RND.str(10);
+    String s3 = RND.str(10);
+
+    String j = RND.str(10);
+
+    //
+    //
+    String str = Strs.join(j, new Object[]{s1, s2, s3});
+    //
+    //
+
+    assertThat(str).isEqualTo(s1 + j + s2 + j + s3);
+
+  }
+
+  @Test
+  public void join_iterable() throws Exception {
+
+    String s1 = RND.str(10);
+    String s2 = RND.str(10);
+    String s3 = RND.str(10);
+
+    String j = RND.str(10);
+
+    List<String> list = new ArrayList<>();
+    list.add(s1);
+    list.add(s2);
+    list.add(s3);
+
+    //
+    //
+    String str = Strs.join(j, list);
+    //
+    //
+
+    assertThat(str).isEqualTo(s1 + j + s2 + j + s3);
+
   }
 }

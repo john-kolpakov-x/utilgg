@@ -29,4 +29,9 @@ public class RND {
     return RND_FAST.nextBoolean();
   }
 
+  public static byte[] bytes(int length) {
+    byte[] ret = new byte[length];
+    RND_FAST.nextBytes(ret);
+    return ret;
+  }
 }
