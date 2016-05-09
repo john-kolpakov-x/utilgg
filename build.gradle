@@ -11,11 +11,16 @@ sourceSets.main.resources.srcDirs = ['src', 'src_resources']
 sourceSets.test.resources.srcDirs = ['test_src', 'test_src_resources']
 
 repositories {
+  mavenLocal()
   mavenCentral()
+  maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 dependencies {
   compile 'org.assertj:assertj-core:2.0.0'
+
+  compile group: 'edu.cmu.sphinx', name: 'sphinx4-core', version:'5prealpha-SNAPSHOT'
+  compile group: 'edu.cmu.sphinx', name: 'sphinx4-data', version:'5prealpha-SNAPSHOT'
 
   testCompile 'org.testng:testng:6.9.9'
   testCompile files("${System.properties['java.home']}/../lib/tools.jar")
