@@ -31,6 +31,15 @@ public class Painter {
     g.setColor(Color.white);
     g.fillRect(X, height - Y - H, W, H);
 
+    if (c.title != null) {
+      int sWidth = g.getFontMetrics().stringWidth(c.title);
+      int sHeight = g.getFontMetrics().getHeight();
+      int sX = X + W / 2 - sWidth / 2;
+      int sY = (height - Y) - sHeight / 2;
+      g.setColor(Color.red.brighter().brighter());
+      g.drawString(c.title, sX, sY);
+    }
+
   }
 
   private static Color colorFor(BorderType type) {

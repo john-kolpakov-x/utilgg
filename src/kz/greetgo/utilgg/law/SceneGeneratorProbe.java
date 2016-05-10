@@ -26,7 +26,7 @@ public class SceneGeneratorProbe {
     BufferedImage im = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
     {
       Graphics2D g = im.createGraphics();
-      g.setColor(new Color(220, 220, 220));
+      g.setColor(new Color(240, 240, 240));
       g.fillRect(0, 0, im.getWidth(), im.getHeight());
 
       Painter painter = new Painter();
